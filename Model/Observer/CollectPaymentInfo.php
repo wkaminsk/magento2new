@@ -3,35 +3,9 @@
 namespace Riskified\Decider\Model\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
-use Riskified\Decider\Model\Logger\Order as OrderLogger;
-use Riskified\Decider\Model\Api\Order as ApiOrder;
 
 class CollectPaymentInfo implements ObserverInterface
 {
-    /**
-     * @var OrderLogger
-     */
-    private $_logger;
-
-    /**
-     * @var ApiOrder
-     */
-    private $_orderApi;
-
-    /**
-     * CollectPaymentInfo constructor.
-     *
-     * @param OrderLogger $logger
-     * @param ApiOrder $orderApi
-     */
-    public function __construct(
-        OrderLogger $logger,
-        ApiOrder $orderApi
-    ) {
-        $this->_logger = $logger;
-        $this->_orderApi = $orderApi;
-    }
-
     /**
      * @param \Magento\Framework\Event\Observer $observer
      */

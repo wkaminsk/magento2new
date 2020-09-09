@@ -4,15 +4,15 @@ namespace Riskified\Decider\Controller\Response;
 
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Request\Http as HttpRequest;
-use \Riskified\DecisionNotification;
-use Riskified\Decider\Model\Api\Api;
-use Riskified\Decider\Model\Api\Order as OrderApi;
-use Riskified\Decider\Model\Api\Log as LogApi;
 use Magento\Framework\Controller\ResultFactory;
+use Riskified\Decider\Model\Api\Api;
+use Riskified\Decider\Model\Api\Log as LogApi;
+use Riskified\Decider\Model\Api\Order as OrderApi;
+use Riskified\DecisionNotification\Exception\AuthorizationException;
+use Riskified\DecisionNotification\Exception\BadPostJsonException;
 
 class Get extends \Magento\Framework\App\Action\Action
 {
-
     const STATUS_OK = 200;
     const STATUS_BAD = 400;
     const STATUS_UNAUTHORIZED = 401;
@@ -125,11 +125,11 @@ class Get extends \Magento\Framework\App\Action\Action
                     $msg = 'Order-Update event triggered.';
                 }
             }
-        } catch (\Riskified\DecisionNotification\Exception\AuthorizationException $e) {
+        } catch (AuthorizationException $e) {
             $logger->logException($e);
             $statusCode = self::STATUS_UNAUTHORIZED;
             $msg = 'Authentication Failed.';
-        } catch (\Riskified\DecisionNotification\Exception\BadPostJsonException $e) {
+        } catch (BadPostJsonException $e) {
             $logger->logException($e);
             $statusCode = self::STATUS_BAD;
             $msg = "JSON Parsing Error.";
