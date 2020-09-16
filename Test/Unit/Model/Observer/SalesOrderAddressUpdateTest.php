@@ -2,28 +2,26 @@
 
 namespace Riskified\Decider\Test\Unit\Model\Observer;
 
-use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use PHPUnit\Framework\TestCase;
-use Riskified\Decider\Model\Logger\Order as LogApi;
 use Riskified\Decider\Model\Api\Order as OrderApi;
-use Riskified\Decider\Model\Observer\OrderPlacedAfter;
+use Riskified\Decider\Model\Logger\Order as OrderLogger;
+use Riskified\Decider\Model\Observer\SalesOrderAddressUpdate;
 
-class OrderPlacedAfterTest extends TestCase
+class SalesOrderAddressUpdateTest extends TestCase
 {
-    /** @var OrderPlacedAfter */
     protected $object;
 
     public function setUp()
     {
         $objectManager = new ObjectManager($this);
 
-        $logger = $this->createMock(LogApi::class);
+        $logger = $this->createMock(OrderLogger::class);
         $api = $this->createMock(OrderApi::class);
 
         $this->object = $objectManager->getObject(
-            OrderPlacedAfter::class,
+            SalesOrderAddressUpdate::class,
             [
                 'logger' => $logger,
                 'api' => $api
@@ -33,23 +31,13 @@ class OrderPlacedAfterTest extends TestCase
 
     public function testExecute()
     {
-        $observer = $this->createPartialMock(Observer::class, ['getOrder']);
-
-        $dataObject = $this->getMockForAbstractClass(
-            AbstractModel::class,
-            [
-                'dataHasChangedFor' => true,
-                'getId' => 1,
-            ],
-            '',
-            false
-        );
+        $observer = $this->createPartialMock(Observer::class, ['getOrderId']);
 
         $observer
             ->expects($this->once())
-            ->method('getOrder')
+            ->method('getOrderId')
             ->willReturn(
-                $dataObject
+                1
             );
 
         $this->object->execute($observer);

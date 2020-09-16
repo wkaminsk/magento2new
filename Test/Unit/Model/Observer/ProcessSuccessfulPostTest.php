@@ -3,37 +3,29 @@
 namespace Riskified\Decider\Test\Unit\Model\Observer;
 
 use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use PHPUnit\Framework\TestCase;
-use Riskified\Decider\Model\Logger\Order as OrderLogger;
 use Riskified\Decider\Model\Api\Order as OrderApi;
+use Riskified\Decider\Model\Logger\Order as OrderLogger;
 use Riskified\Decider\Model\Observer\ProcessSuccessfulPost;
 
-class ProcessSuccessfulPostTest  extends TestCase
+class ProcessSuccessfulPostTest extends TestCase
 {
     protected $object;
 
-    /** @var ObjectManager */
-    protected $objectManager;
-    protected $orderFactory;
-    protected $logger;
-    protected $api;
-    protected $dataObject;
-
     public function setUp()
     {
-        $this->objectManager = new ObjectManager($this);
+        $objectManager = new ObjectManager($this);
 
-        $this->logger = $this->createMock(OrderLogger::class);
-        $this->api = $this->createMock(OrderApi::class);
+        $logger = $this->createMock(OrderLogger::class);
+        $api = $this->createMock(OrderApi::class);
 
-        $this->object = $this->objectManager->getObject(
+        $this->object = $objectManager->getObject(
             ProcessSuccessfulPost::class,
             [
-                'logger' => $this->logger,
-                'api' => $this->api
+                'logger' => $logger,
+                'api' => $api
             ]
         );
     }

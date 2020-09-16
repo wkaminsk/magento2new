@@ -10,13 +10,12 @@ use PHPUnit\Framework\TestCase;
 
 class CollectPaymentInfoTest extends TestCase
 {
-    private $objectManager;
     private $object;
 
     public function setUp()
     {
-        $this->objectManager = new ObjectManager($this);
-        $this->object = $this->objectManager->getObject(
+        $objectManager = new ObjectManager($this);
+        $this->object = $objectManager->getObject(
             CollectPaymentInfo::class
         );
     }

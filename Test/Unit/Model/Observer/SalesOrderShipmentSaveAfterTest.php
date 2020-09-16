@@ -2,17 +2,17 @@
 
 namespace Riskified\Decider\Test\Unit\Model\Observer;
 
-use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Event\Observer;
+use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use PHPUnit\Framework\TestCase;
-use Riskified\Decider\Model\Logger\Order as LogApi;
+use Riskified\Decider\Model\Api\Log as LogApi;
 use Riskified\Decider\Model\Api\Order as OrderApi;
-use Riskified\Decider\Model\Observer\OrderSaveAfter;
+use Riskified\Decider\Model\Observer\SalesOrderShipmentSaveAfter;
 
-class OrderSaveAfterTest extends TestCase
+class SalesOrderShipmentSaveAfterTest extends TestCase
 {
-    /** @var OrderSaveAfter */
+    /** @var object SalesOrderShipmentSaveAfter */
     protected $object;
 
     public function setUp()
@@ -23,23 +23,21 @@ class OrderSaveAfterTest extends TestCase
         $api = $this->createMock(OrderApi::class);
 
         $this->object = $this->objectManager->getObject(
-            OrderSaveAfter::class,
+            SalesOrderShipmentSaveAfter::class,
             [
                 'logger' => $logger,
                 'api' => $api
             ]
         );
     }
-
     public function testExecute()
     {
-        $observer = $this->createPartialMock(Observer::class, ['getOrder']);
+        $observer = $this->createPartialMock(Observer::class, ['getShipment']);
 
         $dataObject = $this->getMockForAbstractClass(
             AbstractModel::class,
             [
-                'dataHasChangedFor' => true,
-                'getId' => 1,
+//                'getId' => 1,
             ],
             '',
             false
@@ -47,7 +45,7 @@ class OrderSaveAfterTest extends TestCase
 
         $observer
             ->expects($this->once())
-            ->method('getOrder')
+            ->method('getShipment')
             ->willReturn(
                 $dataObject
             );
