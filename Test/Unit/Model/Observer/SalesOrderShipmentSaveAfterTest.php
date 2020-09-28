@@ -37,7 +37,7 @@ class SalesOrderShipmentSaveAfterTest extends TestCase
         $dataObject = $this->getMockForAbstractClass(
             AbstractModel::class,
             [
-//                'getId' => 1,
+                'getId' => 1,
             ],
             '',
             false

@@ -4,7 +4,7 @@ namespace Riskified\Decider\Model\Api;
 
 use Riskified\Decider\Model\Logger\Merchant as MerchantLogger;
 use Magento\Framework\App\Helper\Context;
-use Magento\Backend\Model\Auth\Session as AuthSession;
+
 use Magento\Framework\Message\ManagerInterface;
 use Riskified\OrderWebhook\Exception\UnsuccessfulActionException;
 use Riskified\OrderWebhook\Exception\CurlException;
@@ -37,14 +37,13 @@ class Merchant
     private $_messageManager;
 
     /**
-     * @var AuthSession
-     */
-    private $_backendAuthSession;
-
-    /**
      * @var MerchantLogger
      */
     private $logger;
+    /**
+     * @var Config
+     */
+    private $_apiConfig;
 
     /**
      * Merchant constructor.
@@ -54,7 +53,6 @@ class Merchant
      * @param Config $apiConfig
      * @param MerchantLogger $logger
      * @param Context $context
-     * @param AuthSession $backendAuthSession
      * @param ManagerInterface $messageManager
      */
     public function __construct(
@@ -63,7 +61,6 @@ class Merchant
         Config $apiConfig,
         MerchantLogger $logger,
         Context $context,
-        AuthSession $backendAuthSession,
         ManagerInterface $messageManager
     ) {
         $this->_api = $api;
@@ -71,7 +68,6 @@ class Merchant
         $this->_apiConfig = $apiConfig;
         $this->_context = $context;
         $this->_eventManager = $context->getEventManager();
-        $this->_backendAuthSession = $backendAuthSession;
         $this->_messageManager = $messageManager;
         $this->logger = $logger;
 
