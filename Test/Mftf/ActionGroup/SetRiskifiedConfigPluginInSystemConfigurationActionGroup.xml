@@ -5,9 +5,9 @@
   * See COPYING.txt for license details.
   */
 -->
-<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
     <actionGroup name="SetRiskifiedConfigPluginInSystemConfiguration">
+        <click selector="{{AdminLoginToRiskifiedSection.RiskifiedApiTab}}" stepKey="expandApiSettingsTab"/>
         <amOnPage url="admin/admin/system_config/edit/section/riskified" stepKey="navigateToDeciderConfigurationOnDefaultStoreView" />
         <fillField userInput="{{_CREDS.riskified/store_domain}}" selector="{{AdminLoginToRiskifiedSection.RiskifiedShopDomain}}" stepKey="fillAppKey"/>
         <fillField userInput="{{_CREDS.riskified/store_key}}" selector="{{AdminLoginToRiskifiedSection.RiskifiedToken}}" stepKey="fillSecret"/>
