@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
+    <section name="CheckoutPaymentDeciderSection">
+        <element name="placeOrder" type="button" selector=".payment-method._active button.action.primary.checkout" timeout="100"/>
+    </section>
+</sections>
