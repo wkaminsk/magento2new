@@ -5,11 +5,11 @@
             <argument name="statusNote"/>
         </arguments>
         <click selector="{{AdminOrderDeciderSection.riskifiedSubmitOrder}}" stepKey="sendOrderToRiskified"/>
-        <scrollTo selector="{{AdminOrderDeciderSection.firstNoteComment}}" stepKey="scrollToOrderHistory"/>
-<!--        <see selector="{{AdminOrderDeciderSection.firstNoteComment}}" userInput="Under review by Riskified" stepKey="seeUnderReviewStatus"/>-->
+        <wait time="60" stepKey="waitForUpdateStatus"/>
         <!-- reload current page -->
         <reloadPage stepKey="refreshPage"/>
         <waitForPageLoad stepKey="waitForPageReloaded"/>
+        <scrollTo selector="{{AdminOrderDeciderSection.firstNoteComment}}" stepKey="scrollToOrderHistory"/>
         <see selector="{{AdminOrderDeciderSection.firstNoteComment}}" userInput="{{statusNote}}" stepKey="seeRiskifiedStatus"/>
     </actionGroup>
 </actionGroups>
