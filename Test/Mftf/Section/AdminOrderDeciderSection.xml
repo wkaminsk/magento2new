@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
     <section name="AdminOrderDeciderSection">
-        <element name="riskifiedSubmitOrder" type="button" selector="#send_to_riskified" timeout="30"/>
+        <element name="riskifiedSubmitOrder" type="button" selector="#send_to_riskified" timeout="60"/>
         <element name="firstNoteComment" type="text" selector=".note-list .note-list-item:nth-of-type(1) .note-list-comment" timeout="30"/>
     </section>
 </sections>
