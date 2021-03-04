@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontFulfillmentOrderDeciderTest" extends="StorefrontApproveCustomerCreateOrderDeciderTest">
+        <annotations>
+            <stories value="Ship order for decider plugin"/>
+            <description value="Verify admin was able to create shipment with decider module"/>
+            <severity value="AVERAGE"/>
+            <group value="riskified"/>
+        </annotations>
+        <!-- Create Shipment order -->
+        <actionGroup ref="AdminShipThePendingOrderActionGroup" stepKey="createShipment" after="checkRiskifiedStatus"/>
+    </test>
+</tests>

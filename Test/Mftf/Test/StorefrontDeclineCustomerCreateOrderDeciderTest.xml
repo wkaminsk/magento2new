@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontDeclineCustomerCreateOrderDeciderTest" extends="StorefrontApproveCustomerCreateOrderDeciderTest">
+        <annotations>
+            <features value="Riskified"/>
+            <stories value="Create order with specific guest email and check if it is decline"/>
+            <title value="Create order with specific guest email and check if it is decline"/>
+            <description value="Riskified Decider"/>
+            <severity value="AVERAGE"/>
+            <group value="riskified"/>
+        </annotations>
+        <!-- override to change customer email -->
+        <actionGroup ref="GuestCheckoutFillingShippingSectionActionGroup" stepKey="fillAddress">
+            <argument name="customerVar" value="DeclineCustomer"/>
+            <argument name="customerAddressVar" value="CustomerAddressSimple"/>
+            <argument name="shippingMethod" value="Free Shipping"/>
+        </actionGroup>
+        <!-- Verify that your Order got status "Decline (Riskified)" -->
+        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="checkStatus">
+            <argument name="statusNote" value="Order placed by an unauthorized buyer using a proxy connection to mask their identity"/>
+        </actionGroup>
+    </test>
+</tests>

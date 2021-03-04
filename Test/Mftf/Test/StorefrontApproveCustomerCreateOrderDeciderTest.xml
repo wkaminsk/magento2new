@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
-    <test name="AdminFulfillmentOrderDeciderTest">
+    <test name="StorefrontApproveCustomerCreateOrderDeciderTest">
         <annotations>
-            <stories value="Ship order for decider plugin"/>
-            <description value="Verify admin was able to create shipment with decider module"/>
+            <features value="Riskified"/>
+            <stories value="Create order for decider plugin"/>
+            <title value="Create order for decider plugin"/>
+            <description value="Riskified Decider"/>
             <severity value="AVERAGE"/>
             <group value="riskified"/>
         </annotations>
@@ -17,16 +19,12 @@
             <actionGroup ref="LoginAsAdmin" stepKey="loginAsAdmin"/>
         </before>
         <after>
-            <deleteData createDataKey="product" stepKey="deleteProduct"/>
             <deleteData createDataKey="category" stepKey="deleteCategory"/>
+            <deleteData createDataKey="product" stepKey="deleteProduct"/>
             <deleteData createDataKey="customer" stepKey="deleteCustomer"/>
             <actionGroup ref="logout" stepKey="logoutFromAdminArea"/>
         </after>
 
-        <!-- Login as customer -->
-        <actionGroup ref="LoginToStorefrontActionGroup" stepKey="loginToStorefront">
-            <argument name="Customer" value="$$customer$$"/>
-        </actionGroup>
         <!-- Add product to shopping cart -->
         <amOnPage url="{{StorefrontProductPage.url($product.custom_attributes[url_key]$)}}" stepKey="navigateToToPDP"/>
         <actionGroup ref="StorefrontAddProductToCartWithQtyActionGroup" stepKey="addProductToCart">
@@ -34,16 +32,21 @@
         </actionGroup>
         <!-- Place order -->
         <actionGroup ref="GoToCheckoutFromMinicartActionGroup" stepKey="navigateToCheckout"/>
-        <actionGroup ref="StorefrontSelectShippingInfoActionGroup" stepKey="checkoutWithSingleShipping">
-            <argument name="shippingMethodType" value="flatrate_flatrate"/>
+        <actionGroup ref="GuestCheckoutFillingShippingSectionActionGroup" stepKey="fillAddress">
+            <argument name="customerVar" value="ApproveCustomer"/>
+            <argument name="customerAddressVar" value="CustomerAddressSimple"/>
+            <argument name="shippingMethod" value="Free Shipping"/>
         </actionGroup>
         <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectPaymentMethod"/>
         <actionGroup ref="ClickPlaceOrderDeciderActionGroup" stepKey="clickOnPlaceOrder"/>
-        <grabTextFrom selector="{{CheckoutSuccessMainSection.orderNumber22}}" stepKey="orderNumber"/>
-        <!-- Create Shipment order -->
+        <grabTextFrom selector="{{CheckoutSuccessMainSection.orderNumber}}" stepKey="orderNumber"/>
+
+        <!-- Verify that your Order got status "Approved (Riskified)" -->
         <actionGroup ref="OpenOrderByIdActionGroup" stepKey="openOrder">
             <argument name="orderId" value="{$orderNumber}"/>
         </actionGroup>
-        <actionGroup ref="AdminShipThePendingOrderActionGroup" stepKey="createInvoice"/>
+        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="checkRiskifiedStatus">
+            <argument name="statusNote" value="Reviewed and approved by Riskified"/>
+        </actionGroup>
     </test>
 </tests>

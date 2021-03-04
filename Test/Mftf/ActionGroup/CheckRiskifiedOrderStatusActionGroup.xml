@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="CheckRiskifiedOrderStatusActionGroup">
+        <arguments>
+            <argument name="statusNote"/>
+        </arguments>
+        <click selector="{{AdminOrderDeciderSection.riskifiedSubmitOrder}}" stepKey="sendOrderToRiskified"/>
+        <scrollTo selector="{{AdminOrderDeciderSection.firstNoteComment}}" stepKey="scrollToOrderHistory"/>
+        <see selector="{{AdminOrderDeciderSection.firstNoteComment}}" userInput="Under review by Riskified" stepKey="seeUnderReviewStatus"/>
+        <!-- reload current page -->
+        <reloadPage stepKey="refreshPage"/>
+        <waitForPageLoad stepKey="waitForPageReloaded"/>
+        <see selector="{{AdminOrderDeciderSection.firstNoteComment}}" userInput="{{statusNote}}" stepKey="seeRiskifiedStatus"/>
+    </actionGroup>
+</actionGroups>
