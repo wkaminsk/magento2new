@@ -35,7 +35,7 @@
         <actionGroup ref="GuestCheckoutFillingShippingSectionActionGroup" stepKey="fillAddress">
             <argument name="customerVar" value="ApproveCustomer"/>
             <argument name="customerAddressVar" value="CustomerAddressSimple"/>
-            <argument name="shippingMethod" value="Free Shipping"/>
+            <argument name="shippingMethod" value="Flat Rate"/>
         </actionGroup>
         <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectPaymentMethod"/>
         <actionGroup ref="ClickPlaceOrderDeciderActionGroup" stepKey="clickOnPlaceOrder"/>
