@@ -10,6 +10,6 @@
         <reloadPage stepKey="refreshPage"/>
         <waitForPageLoad stepKey="waitForPageReloaded"/>
         <scrollTo selector="{{AdminOrderDeciderSection.firstNoteComment}}" stepKey="scrollToOrderHistory"/>
-        <see selector="{{AdminOrderDeciderSection.firstNoteComment}}" userInput="{{statusNote}}" stepKey="seeRiskifiedStatus"/>
+        <see selector="{{AdminOrderDeciderSection.firstNoteComment}}" userInput="statusNote" stepKey="seeRiskifiedStatus"/>
     </actionGroup>
 </actionGroups>
