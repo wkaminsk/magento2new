@@ -2,7 +2,7 @@
 <actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
     <actionGroup name="CheckRiskifiedOrderStatusActionGroup">
         <arguments>
-            <argument name="statusNote"/>
+            <argument name="statusNote" type="string"/>
         </arguments>
         <click selector="{{AdminOrderDeciderSection.riskifiedSubmitOrder}}" stepKey="sendOrderToRiskified"/>
         <wait time="60" stepKey="waitForUpdateStatus"/>
