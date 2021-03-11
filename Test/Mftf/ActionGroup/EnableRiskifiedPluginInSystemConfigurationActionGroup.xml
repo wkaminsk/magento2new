@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
     <actionGroup name="EnableRiskifiedPluginInSystemConfiguration">
-        <click selector="{{AdminLoginToRiskifiedSection.RiskifiedGeneralTab}}" stepKey="expandRiskifiedGeneralTab"/>
+        <conditionalClick selector="{{AdminLoginToRiskifiedSection.RiskifiedGeneralTab}}" dependentSelector="{{AdminLoginToRiskifiedSection.RiskifiedGeneralTabExpanded}}" visible="false" stepKey="expandRiskifiedGeneralTab"/>
         <selectOption userInput="1" selector="{{AdminLoginToRiskifiedSection.RiskifiedEnabled}}" stepKey="setRiskifiedAsActive"/>
         <seeOptionIsSelected userInput="Yes" selector="{{AdminLoginToRiskifiedSection.RiskifiedEnabled}}" stepKey="seeRiskifiedEnabled"/>
 
