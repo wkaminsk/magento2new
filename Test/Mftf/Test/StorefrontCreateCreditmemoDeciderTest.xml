@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<tests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/testSchema.xsd">
+    <test name="StorefrontCreateCreditmemoDeciderTest" extends="StorefrontApproveCustomerCreateOrderDeciderTest">
+        <annotations>
+            <stories value="Create creditmemo for decider plugin"/>
+            <description value="Verify admin was able to create creditmemo with decider module"/>
+            <severity value="AVERAGE"/>
+            <group value="riskified"/>
+        </annotations>
+        <before>
+            <actionGroup ref="ChangeRiskifiedAutoInvoiceConfigurationActionGroup" stepKey="enableAutoInvoice" after="loginAsAdmin">
+                <argument name="option" value="1"/>
+            </actionGroup>
+        </before>
+        <after>
+            <actionGroup ref="ChangeRiskifiedAutoInvoiceConfigurationActionGroup" stepKey="disableAutoInvoice" before="logoutFromAdminArea">
+                <argument name="option" value="0"/>
+            </actionGroup>
+        </after>
+
+        <!-- Create Invoice -->
+        <actionGroup ref="StartCreateInvoiceFromOrderPage" stepKey="startInvoice"/>
+        <click selector="{{AdminInvoiceMainActionsSection.submitInvoice}}" stepKey="clickSubmitInvoice"/>
+        <waitForElementVisible selector="{{AdminMessagesSection.success}}" stepKey="waitForMessageAppears"/>
+        <see selector="{{AdminMessagesSection.success}}" userInput="The invoice has been created." stepKey="seeInvoiceCreateSuccess"/>
+
+        <!-- Click 'Credit Memo' button and fill data from dataset: refund -->
+        <actionGroup ref="AdminOpenAndFillCreditMemoRefundActionGroup" stepKey="fillCreditMemoRefund">
+            <argument name="itemQtyToRefund" value="5"/>
+            <argument name="shippingRefund" value="25"/>
+            <argument name="adjustmentRefund" value="98"/>
+            <argument name="adjustmentFee" value="0"/>
+        </actionGroup>
+
+        <!-- On order's page click 'Refund offline' button -->
+        <click selector="{{AdminCreditMemoTotalSection.submitRefundOffline}}" stepKey="clickRefundOffline"/>
+        <waitForPageLoad stepKey="waitForResultPage"/>
+
+        <!-- Perform all assertions: assert refund success create message -->
+        <see selector="{{AdminIndexManagementSection.successMessage}}" userInput="You created the credit memo." stepKey="assertRefundSuccessCreateMessage"/>
+    </test>
+</tests>

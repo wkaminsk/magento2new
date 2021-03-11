@@ -14,7 +14,7 @@
         <actionGroup ref="GuestCheckoutFillingShippingSectionActionGroup" stepKey="fillAddress">
             <argument name="customerVar" value="DeclineCustomer"/>
             <argument name="customerAddressVar" value="CustomerAddressSimple"/>
-            <argument name="shippingMethod" value="Free Shipping"/>
+            <argument name="shippingMethod" value="Flat Rate"/>
         </actionGroup>
         <!-- Verify that your Order got status "Decline (Riskified)" -->
         <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="checkStatus">

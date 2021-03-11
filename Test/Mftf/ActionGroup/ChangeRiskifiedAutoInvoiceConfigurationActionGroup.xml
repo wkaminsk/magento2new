@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
+    <actionGroup name="ChangeRiskifiedAutoInvoiceConfigurationActionGroup">
+        <arguments>
+            <argument name="option" type="string"/>
+        </arguments>
+        <amOnPage url="admin/admin/system_config/edit/section/riskified" stepKey="navigateToDeciderConfigurationOnDefaultStoreView" />
+        <conditionalClick selector="{{AdminLoginToRiskifiedSection.RiskifiedApiTab}}" dependentSelector="{{AdminLoginToRiskifiedSection.RiskifiedApiTabClosed}}" visible="false" stepKey="expandRiskifiedApiTab"/>
+        <scrollTo selector="{{AdminLoginToRiskifiedSection.RiskifiedAutoInvoice}}" stepKey="scrollToRiskifiedAutoInvoice"/>
+        <selectOption userInput="{{option}}" selector="{{AdminLoginToRiskifiedSection.RiskifiedAutoInvoice}}" stepKey="setAutoInvoice"/>
+
+        <click selector="{{AdminLoginToRiskifiedSection.SaveConfiguration}}" stepKey="ClickOnSaveConfig"/>
+        <seeElement selector="{{AdminLoginToRiskifiedSection.SavedConfiguration}}" stepKey="checkConfigurationSaved"/>
+    </actionGroup>
+</actionGroups>
