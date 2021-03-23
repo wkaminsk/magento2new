@@ -21,7 +21,7 @@
         <!-- Create shipping -->
         <actionGroup ref="ShipOrderActionGroup" stepKey="shipOrder" after="openOrder"/>
         <!-- Override send and check riskified status to only check "Approved (Riskified)" -->
-        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="sendAndCheckRiskifiedOrderStatus" after="checkShipmentSuccessMessage">
+        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="sendAndCheckRiskifiedOrderStatus">
             <argument name="statusNote" value="Reviewed and approved by Riskified"/>
         </actionGroup>
         <!-- Click 'Credit Memo' button and fill data from dataset: refund -->
