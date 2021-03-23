@@ -11,7 +11,7 @@
         <scrollTo selector="{{AdminOrderDeciderSection.firstNoteComment}}" stepKey="scrollToOrderHistory"/>
         <see selector="{{AdminOrderDeciderSection.firstNoteComment}}" userInput="{{statusNote}}" stepKey="seeRiskifiedStatus"/>
     </actionGroup>
-    <actionGroup name="SendAndCheckRiskifiedOrderActionGroup" extends="CheckRiskifiedOrderStatusActionGroup">
+    <actionGroup name="SendAndCheckRiskifiedOrderStatusActionGroup" extends="CheckRiskifiedOrderStatusActionGroup">
         <click selector="{{AdminOrderDeciderSection.riskifiedSubmitOrder}}" stepKey="sendOrderToRiskified" before="waitForUpdateStatus"/>
     </actionGroup>
 </actionGroups>
