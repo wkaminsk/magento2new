@@ -17,7 +17,7 @@
             <argument name="shippingMethod" value="Flat Rate"/>
         </actionGroup>
         <!-- Verify that your Order got status "Decline (Riskified)" -->
-        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="checkRiskifiedOrderStatus">
+        <actionGroup ref="SendAndCheckRiskifiedOrderStatusActionGroup" stepKey="sendAndCheckRiskifiedStatus">
             <argument name="statusNote" value="Order exhibits strong fraudulent indicators"/>
         </actionGroup>
     </test>

@@ -37,7 +37,7 @@
             <argument name="customerAddressVar" value="CustomerAddressSimple"/>
             <argument name="shippingMethod" value="Flat Rate"/>
         </actionGroup>
-        <actionGroup ref="useBraintreeForMasterCard" stepKey="selectPayment"/>
+        <actionGroup ref="CheckoutSelectCheckMoneyOrderPaymentActionGroup" stepKey="selectPaymentMethod"/>
         <actionGroup ref="ClickPlaceOrderDeciderActionGroup" stepKey="clickOnPlaceOrder"/>
         <grabTextFrom selector="{{CheckoutSuccessMainSection.orderNumber}}" stepKey="orderNumber"/>
 
@@ -45,7 +45,7 @@
         <actionGroup ref="OpenOrderByIdActionGroup" stepKey="openOrder">
             <argument name="orderId" value="{$orderNumber}"/>
         </actionGroup>
-        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="checkRiskifiedOrderStatus">
+        <actionGroup ref="SendAndCheckRiskifiedOrderStatusActionGroup" stepKey="sendAndCheckRiskifiedOrderStatus">
             <argument name="statusNote" value="Reviewed and approved by Riskified"/>
         </actionGroup>
     </test>
