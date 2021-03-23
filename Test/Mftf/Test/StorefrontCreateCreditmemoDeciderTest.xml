@@ -18,17 +18,12 @@
                 <argument name="option" value="0"/>
             </actionGroup>
         </after>
-
         <!-- Create shipping -->
-        <click selector="{{AdminOrderDetailsMainActionsSection.ship}}" stepKey="clickShipAction" after="openOrder"/>
-        <click selector="{{AdminShipmentMainActionsSection.submitShipment}}" stepKey="clickSubmitShipment"/>
-        <see selector="{{AdminOrderDetailsMessagesSection.successMessage}}" userInput="The shipment has been created." stepKey="checkShipmentSuccessMessage"/>
-
-        <!-- Verify that your Order got status "Approved (Riskified)" -->
-        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="checkRiskifiedStatus" after="checkShipmentSuccessMessage">
+        <actionGroup ref="ShipOrderActionGroup" stepKey="shipOrder" after="openOrder"/>
+        <!-- Override send and check riskified status to only check "Approved (Riskified)" -->
+        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="sendAndCheckRiskifiedOrderStatus" after="checkShipmentSuccessMessage">
             <argument name="statusNote" value="Reviewed and approved by Riskified"/>
         </actionGroup>
-
         <!-- Click 'Credit Memo' button and fill data from dataset: refund -->
         <actionGroup ref="AdminOpenAndFillCreditMemoRefundActionGroup" stepKey="fillCreditMemoRefund">
             <argument name="itemQtyToRefund" value="5"/>
@@ -36,7 +31,6 @@
             <argument name="adjustmentRefund" value="98"/>
             <argument name="adjustmentFee" value="0"/>
         </actionGroup>
-
         <!-- On order's page click 'Refund offline' button -->
         <click selector="{{AdminCreditMemoTotalSection.submitRefundOffline}}" stepKey="clickRefundOffline"/>
         <waitForPageLoad stepKey="waitForResultPage"/>
