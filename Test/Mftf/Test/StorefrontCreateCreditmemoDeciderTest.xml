@@ -20,10 +20,12 @@
         </after>
 
         <!-- Create shipping -->
-        <actionGroup ref="AdminShipThePendingOrderActionGroup" stepKey="createShipment" after="openOrder"/>
+        <click selector="{{AdminOrderDetailsMainActionsSection.ship}}" stepKey="clickShipAction" after="openOrder"/>
+        <click selector="{{AdminShipmentMainActionsSection.submitShipment}}" stepKey="clickSubmitShipment"/>
+        <see selector="{{AdminOrderDetailsMessagesSection.successMessage}}" userInput="The shipment has been created." stepKey="checkShipmentSuccessMessage"/>
 
         <!-- Verify that your Order got status "Approved (Riskified)" -->
-        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="checkRiskifiedStatus" after="createShipment">
+        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="checkRiskifiedStatus" after="checkShipmentSuccessMessage">
             <argument name="statusNote" value="Reviewed and approved by Riskified"/>
         </actionGroup>
 

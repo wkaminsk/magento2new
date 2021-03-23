@@ -45,7 +45,8 @@
         <actionGroup ref="OpenOrderByIdActionGroup" stepKey="openOrder">
             <argument name="orderId" value="{$orderNumber}"/>
         </actionGroup>
-        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="checkRiskifiedStatus">
+        <actionGroup ref="SendRiskifiedOrderActionGroup" stepKey="sendOrderToRiskified"/>
+        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="checkOrderStatus">
             <argument name="statusNote" value="Reviewed and approved by Riskified"/>
         </actionGroup>
     </test>
