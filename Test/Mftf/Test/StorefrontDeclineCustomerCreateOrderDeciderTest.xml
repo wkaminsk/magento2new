@@ -18,7 +18,7 @@
         </actionGroup>
         <!-- Verify that your Order got status "Decline (Riskified)" -->
         <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="checkRiskifiedStatus">
-            <argument name="statusNote" value="Order placed by an unauthorized buyer using a proxy connection to mask their identity"/>
+            <argument name="statusNote" value="Order exhibits strong fraudulent indicators"/>
         </actionGroup>
     </test>
 </tests>

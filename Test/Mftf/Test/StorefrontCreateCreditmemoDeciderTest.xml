@@ -19,11 +19,9 @@
             </actionGroup>
         </after>
 
-        <!-- Create Invoice -->
-        <actionGroup ref="StartCreateInvoiceFromOrderPage" stepKey="startInvoice"/>
-        <click selector="{{AdminInvoiceMainActionsSection.submitInvoice}}" stepKey="clickSubmitInvoice"/>
-        <waitForElementVisible selector="{{AdminMessagesSection.success}}" stepKey="waitForMessageAppears"/>
-        <see selector="{{AdminMessagesSection.success}}" userInput="The invoice has been created." stepKey="seeInvoiceCreateSuccess"/>
+        <!-- Create shipping -->
+        <actionGroup ref="AdminShipThePendingOrderActionGroup" stepKey="createShipment"/>
+
 
         <!-- Click 'Credit Memo' button and fill data from dataset: refund -->
         <actionGroup ref="AdminOpenAndFillCreditMemoRefundActionGroup" stepKey="fillCreditMemoRefund">
