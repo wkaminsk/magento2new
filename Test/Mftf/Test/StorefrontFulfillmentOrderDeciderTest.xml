@@ -9,6 +9,6 @@
             <group value="riskified"/>
         </annotations>
         <!-- Create Shipment order -->
-        <actionGroup ref="AdminShipThePendingOrderActionGroup" stepKey="createShipment" after="sendAndCheckRiskifiedOrderStatus"/>
+        <actionGroup ref="AdminShipThePendingOrderActionGroup" stepKey="createShipment" after="checkRiskifiedOrderStatus"/>
     </test>
 </tests>
