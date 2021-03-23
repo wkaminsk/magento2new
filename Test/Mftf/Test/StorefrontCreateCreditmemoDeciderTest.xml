@@ -20,8 +20,12 @@
         </after>
 
         <!-- Create shipping -->
-        <actionGroup ref="AdminShipThePendingOrderActionGroup" stepKey="createShipment"/>
+        <actionGroup ref="AdminShipThePendingOrderActionGroup" stepKey="createShipment" after="openOrder"/>
 
+        <!-- Verify that your Order got status "Approved (Riskified)" -->
+        <actionGroup ref="CheckRiskifiedOrderStatusActionGroup" stepKey="checkRiskifiedStatus" after="createShipment">
+            <argument name="statusNote" value="Reviewed and approved by Riskified"/>
+        </actionGroup>
 
         <!-- Click 'Credit Memo' button and fill data from dataset: refund -->
         <actionGroup ref="AdminOpenAndFillCreditMemoRefundActionGroup" stepKey="fillCreditMemoRefund">
