@@ -2,6 +2,7 @@
 
 namespace Riskified\Decider\Model\Observer;
 
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Riskified\Decider\Model\Api\Api;
 use Riskified\Decider\Model\Api\Log as LogApi;
@@ -48,13 +49,14 @@ class OrderPaymentRefund implements ObserverInterface
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         try {
             $creditMemo = $observer->getEvent()->getCreditmemo();
             $order = $creditMemo->getOrder();
+            $this->logger->log(__("Running Refund for order #%1", $order->getIncrementId()), 2);
             $this->saveMemoInRegistry($creditMemo);
             $this->apiOrderLayer->post($order, Api::ACTION_REFUND);
         } catch (\Exception $e) {

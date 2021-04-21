@@ -2,12 +2,15 @@
 
 namespace Riskified\Decider\Model\Observer;
 
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
-use Riskified\Decider\Model\Api\Log as LogApi;
 use Riskified\Decider\Model\Api\Config as ApiConfig;
-use Riskified\Decider\Model\Api\Order\Config as OrderConfig;
+use Riskified\Decider\Model\Api\Log as LogApi;
 use Riskified\Decider\Model\Api\Order as OrderApi;
+use Riskified\Decider\Model\Api\Order\Config as OrderConfig;
 
 class UpdateOrderState implements ObserverInterface
 {
@@ -32,32 +35,30 @@ class UpdateOrderState implements ObserverInterface
     private $apiOrderConfig;
 
     /**
-     * @var \Magento\Framework\App\ResourceConnection
+     * @var ResourceConnection
      */
     private $resource;
 
     /**
-     * @var \Magento\Sales\Model\OrderRepository
+     * @var OrderRepositoryInterface
      */
     private $orderRepository;
 
     /**
-     * UpdateOrderState constructor.
-     *
      * @param LogApi $logger
      * @param ApiConfig $config
      * @param OrderConfig $apiOrderConfig
      * @param OrderApi $orderApi
-     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
-     * @param \Magento\Framework\App\ResourceConnection $resource
+     * @param OrderRepositoryInterface $orderRepository
+     * @param ResourceConnection $resource
      */
     public function __construct(
         LogApi $logger,
         ApiConfig $config,
         OrderConfig $apiOrderConfig,
         OrderApi $orderApi,
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-        \Magento\Framework\App\ResourceConnection $resource
+        OrderRepositoryInterface $orderRepository,
+        ResourceConnection $resource
     ) {
         $this->logger = $logger;
         $this->apiOrderConfig = $apiOrderConfig;
@@ -68,10 +69,9 @@ class UpdateOrderState implements ObserverInterface
     }
 
     /**
-     * Observer handler
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         $order = $observer->getOrder();
         $riskifiedStatus = (string)$observer->getStatus();
@@ -209,7 +209,7 @@ class UpdateOrderState implements ObserverInterface
             try {
                 $this->orderRepository->save($order);
             } catch (\Exception $e) {
-                $this->logger->log("Error saving order: " . $e->getMessage());
+                $this->logger->logException("Error saving order: " . $e->getMessage());
 
                 return;
             }
@@ -250,10 +250,10 @@ class UpdateOrderState implements ObserverInterface
                 }
                 if ($status !== false) {
                     $connection = $this->resource->getConnection(
-                        \Magento\Framework\App\ResourceConnection::DEFAULT_CONNECTION
+                        ResourceConnection::DEFAULT_CONNECTION
                     );
                     $tableOrderStatuses = $connection->getTableName('sales_order_status_state');
-                    $result = $connection->fetchRow('SELECT state FROM `'.$tableOrderStatuses.'` WHERE status="' . $status.'"');
+                    $result = $connection->fetchRow('SELECT state FROM `' . $tableOrderStatuses . '` WHERE status="' . $status . '"');
                     $state = $result['state'];
 
                     $order->setHoldBeforeState($state);

@@ -2,8 +2,10 @@
 
 namespace Riskified\Decider\Model\Observer;
 
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Riskified\Decider\Model\Api\Api;
+use Riskified\Decider\Model\Api\Log;
 use Riskified\Decider\Model\Logger\Order as OrderLogger;
 use Riskified\Decider\Model\Api\Order as OrderApi;
 
@@ -12,31 +14,31 @@ class OrderPlacedAfter implements ObserverInterface
     /**
      * @var OrderLogger
      */
-    private $_logger;
+    private $logger;
 
     /**
      * @var OrderApi
      */
-    private $_orderApi;
+    private $orderApi;
 
     /**
      * OrderPlacedAfter constructor.
      *
-     * @param OrderLogger $logger
+     * @param Log $logger
      * @param OrderApi $orderApi
      */
     public function __construct(
-        OrderLogger $logger,
+        Log $logger,
         OrderApi $orderApi
     ) {
-        $this->_logger = $logger;
-        $this->_orderApi = $orderApi;
+        $this->logger = $logger;
+        $this->orderApi = $orderApi;
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         $order = $observer->getOrder();
 
@@ -44,14 +46,16 @@ class OrderPlacedAfter implements ObserverInterface
             return;
         }
 
+        $this->logger->log(__("After Place order Observer for order #%1", $order->getIncrementId()), 2);
+
         if ($order->dataHasChangedFor('state')) {
             try {
-                $this->_orderApi->post($order, Api::ACTION_UPDATE);
+                $this->orderApi->post($order, Api::ACTION_UPDATE);
             } catch (\Exception $e) {
-                $this->_logger->critical($e);
+                $this->logger->logException($e);
             }
         } else {
-            $this->_logger->debug(__("No data found"));
+            $this->logger->log(__("No data found"), 2);
         }
     }
 }

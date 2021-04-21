@@ -2,9 +2,12 @@
 
 namespace Riskified\Decider\Controller\Adminhtml\Riskified;
 
+use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Riskified\Decider\Model\Api\Log;
 use Riskified\Decider\Model\Api\Order as OrderApi;
 
-class Send extends \Magento\Backend\App\Action
+class Send extends Action
 {
     /**
      * @var OrderApi
@@ -12,17 +15,22 @@ class Send extends \Magento\Backend\App\Action
     protected $apiOrderLayer;
 
     /**
-     * Send constructor.
-     *
-     * @param \Magento\Backend\App\Action\Context $context
+     * @var Log
+     */
+    private $logger;
+
+    /**
+     * @param Context $context
      * @param OrderApi $apiOrderLayer
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        OrderApi $apiOrderLayer
+        Context $context,
+        OrderApi $apiOrderLayer,
+        Log $logger
     ) {
-        parent::__construct($context);
         $this->apiOrderLayer = $apiOrderLayer;
+        $this->logger = $logger;
+        parent::__construct($context);
     }
 
     /**
@@ -30,8 +38,10 @@ class Send extends \Magento\Backend\App\Action
      */
     public function execute()
     {
+        $this->logger->log(__("Initializing send order action"), 2);
         $id = $this->getRequest()->getParam('order_id');
         $this->apiOrderLayer->sendOrders([$id]);
+        $this->logger->log(__("Order with id: %1 was sent", $id), 2);
         $this->_redirect("sales/order/view", ['order_id' => $id]);
     }
 }

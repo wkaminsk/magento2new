@@ -74,13 +74,12 @@ class Get extends \Magento\Framework\App\Action\Action
         $request = $this->getRequest();
         $logger = $this->apiLogger;
 
-        $logger->log(
-            __("Riskified extension endpoint start")
-        );
+        $logger->log(__("Riskified extension endpoint start"));
 
         $id = null;
         $msg = null;
         try {
+            $logger->log(__("Initializing Sdk"), 2);
             $this->api->initSdk();
             $notification = $this->api->parseRequest($request);
             $id = $notification->id;
@@ -92,14 +91,16 @@ class Get extends \Magento\Framework\App\Action\Action
                     sprintf(
                         __("Test Notification received: %s"),
                         serialize($notification)
-                    )
+                    ),
+                    2
                 );
             } else {
                 $logger->log(
                     sprintf(
                         __("Notification received: %s"),
                         serialize($notification)
-                    )
+                    ),
+                    2
                 );
 
                 /** @var \Magento\Sales\Api\Data\OrderInterface $order */

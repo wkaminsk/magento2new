@@ -2,14 +2,15 @@
 
 namespace Riskified\Decider\Model\Observer;
 
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Riskified\Decider\Model\Logger\Order as OrderLogger;
+use Riskified\Decider\Model\Api\Log;
 use Riskified\Decider\Model\Api\Order as OrderApi;
 
 class ProcessSuccessfulPost implements ObserverInterface
 {
     /**
-     * @var OrderLogger
+     * @var Log
      */
     private $logger;
 
@@ -19,12 +20,11 @@ class ProcessSuccessfulPost implements ObserverInterface
     private $orderApi;
 
     /**
-     * ProcessSuccessfulPost constructor.
-     * @param OrderLogger $logger
+     * @param Log $logger
      * @param OrderApi $orderApi
      */
     public function __construct(
-        OrderLogger $logger,
+        Log $logger,
         OrderApi $orderApi
     ) {
         $this->logger = $logger;
@@ -32,11 +32,12 @@ class ProcessSuccessfulPost implements ObserverInterface
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         $order = $observer->getOrder();
+        $this->logger->log(__("Running Successful Post Observer for Order: #%1", $order->getIncrementId()), 2);
         $response = $observer->getResponse();
         if (isset($response->order)) {
             $orderId = $response->order->id;

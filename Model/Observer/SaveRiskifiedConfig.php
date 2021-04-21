@@ -2,17 +2,24 @@
 
 namespace Riskified\Decider\Model\Observer;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Riskified\OrderWebhook\Model;
-use Riskified\Decider\Model\Logger\Merchant as MerchantLogger;
-use Riskified\Decider\Model\Api\Config as ApiConfig;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\UrlInterface;
 use Magento\Payment\Model\Config as PaymentConfig;
+use Magento\Store\Model\StoreManagerInterface;
+use Riskified\Decider\Model\Api\Config as ApiConfig;
+use Riskified\Decider\Model\Api\Log;
 use Riskified\Decider\Model\Api\Merchant as ApiMerchant;
+use Riskified\OrderWebhook\Exception\CurlException;
+use Riskified\OrderWebhook\Exception\UnsuccessfulActionException;
+use Riskified\OrderWebhook\Model;
 
 class SaveRiskifiedConfig implements ObserverInterface
 {
     /**
-     * @var MerchantLogger
+     * @var Log
      */
     private $logger;
 
@@ -32,32 +39,30 @@ class SaveRiskifiedConfig implements ObserverInterface
     private $_paymentConfig;
 
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
+     * @var StoreManagerInterface
      */
     private $storeManager;
 
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     * @var ScopeConfigInterface
      */
     private $storeConfig;
 
     /**
-     * SaveRiskifiedConfig constructor.
-     *
-     * @param MerchantLogger $logger
+     * @param Log $logger
      * @param ApiConfig $config
      * @param PaymentConfig $paymentConfig
      * @param ApiMerchant $merchantApi
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $storeConfig
+     * @param StoreManagerInterface $storeManager
+     * @param ScopeConfigInterface $storeConfig
      */
     public function __construct(
-        MerchantLogger $logger,
+        Log $logger,
         ApiConfig $config,
         PaymentConfig $paymentConfig,
         ApiMerchant $merchantApi,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\App\Config\ScopeConfigInterface $storeConfig
+        StoreManagerInterface $storeManager,
+        ScopeConfigInterface $storeConfig
     ) {
         $this->logger = $logger;
         $this->apiConfig = $config;
@@ -68,13 +73,14 @@ class SaveRiskifiedConfig implements ObserverInterface
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Riskified\OrderWebhook\Exception\CurlException
-     * @throws \Riskified\OrderWebhook\Exception\UnsuccessfulActionException
+     * @param Observer $observer
+     * @throws NoSuchEntityException
+     * @throws CurlException
+     * @throws UnsuccessfulActionException
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
+        $this->logger->log(__("Running save riskified config"), 2);
         if (!$this->apiConfig->isEnabled()) {
             return;
         }
@@ -92,7 +98,7 @@ class SaveRiskifiedConfig implements ObserverInterface
         $extensionVersion = $helper->getExtensionVersion();
 
         $shopHostUrl = $this->storeManager->getStore()
-            ->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_WEB);
+            ->getBaseUrl(UrlInterface::URL_TYPE_WEB);
 
         $settings['gws'] = $gateWays;
         $settings['host_url'] = $shopHostUrl;
@@ -100,9 +106,9 @@ class SaveRiskifiedConfig implements ObserverInterface
         unset($settings['key']);
         unset($settings['domain']);
 
-        $settingsModel = new Model\MerchantSettings(array(
+        $settingsModel = new Model\MerchantSettings([
             'settings' => $settings
-        ));
+        ]);
 
         if ($this->apiConfig->getAuthToken() && $this->apiConfig->getShopDomain()) {
             $this->apiMerchantLayer->update($settingsModel);

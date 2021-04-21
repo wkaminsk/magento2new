@@ -6,12 +6,15 @@ use Magento\Framework\App\State;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Model\Context;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\InvoiceRepositoryInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order as OrderEntity;
 use Magento\Sales\Model\Service\InvoiceService;
 use Riskified\Decider\Model\Api\Config;
+use Riskified\Decider\Model\Api\Log;
 use Riskified\Decider\Model\Api\Order as OrderApi;
-use Riskified\Decider\Model\Api\Order\Log;
-use Riskified\Decider\Model\Logger\Order;
+use Riskified\Decider\Model\Api\Order\Log as OrderLog;
 
 /**
  * Observer Auto Invoice Class.
@@ -25,7 +28,7 @@ class AutoInvoice implements ObserverInterface
     /**
      * Module main logger class.
      *
-     * @var Order
+     * @var Log
      */
     private $logger;
 
@@ -39,7 +42,7 @@ class AutoInvoice implements ObserverInterface
     /**
      * Api logger.
      *
-     * @var Log
+     * @var OrderLog
      */
     private $apiOrderLogger;
 
@@ -74,42 +77,38 @@ class AutoInvoice implements ObserverInterface
     /**
      * Order repository class.
      *
-     * @var \Magento\Sales\Api\OrderRepositoryInterface
+     * @var OrderRepositoryInterface
      */
     private $orderRepository;
 
     /**
      * Invoice repository class.
      *
-     * @var \Magento\Sales\Api\InvoiceRepositoryInterface
+     * @var InvoiceRepositoryInterface
      */
     private $invoiceRepository;
 
+
     /**
-     * AutoInvoice constructor.
-     *
-     * @param Log                  $apiOrderLogger
-     * @param Order                $logger
-     * @param Config               $apiConfig
-     * @param OrderApi             $orderApi
-     * @param InvoiceService       $invoiceService
-     * @param Context              $context
-     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-     * @param \Magento\Sales\Api\InvoiceRepositoryInterface $invoiceRepository
+     * @param OrderLog $apiOrderLogger
+     * @param Log $logger
+     * @param Config $apiConfig
+     * @param InvoiceService $invoiceService
+     * @param Context $context
+     * @param OrderRepositoryInterface $orderRepository
+     * @param InvoiceRepositoryInterface $invoiceRepository
      */
     public function __construct(
-        Log $apiOrderLogger,
-        Order $logger,
+        OrderLog $apiOrderLogger,
+        Log $logger,
         Config $apiConfig,
-        OrderApi $orderApi,
         InvoiceService $invoiceService,
         Context $context,
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-        \Magento\Sales\Api\InvoiceRepositoryInterface $invoiceRepository
+        OrderRepositoryInterface $orderRepository,
+        InvoiceRepositoryInterface $invoiceRepository
     ) {
         $this->logger = $logger;
         $this->context = $context;
-        $this->apiOrder = $orderApi;
         $this->apiConfig = $apiConfig;
         $this->apiOrderLogger = $apiOrderLogger;
         $this->invoiceService = $invoiceService;
@@ -131,23 +130,16 @@ class AutoInvoice implements ObserverInterface
             return false;
         }
 
-        /** @var \Magento\Sales\Api\Data\OrderInterface $order */
+        /** @var OrderInterface $order */
         $order = $observer->getOrder();
 
         if (!$order || !$order->getId()) {
             return false;
         }
-        $this->logger->addInfo(
-            sprintf(
-                __('Auto-invoicing  order #%s'),
-                $order->getIncrementId()
-            )
-        );
+        $this->logger->log(sprintf(__('Auto-invoicing  order #%s'), $order->getIncrementId()), 2);
 
-        if (!$order->canInvoice()
-            || $order->getState() != OrderEntity::STATE_PROCESSING
-        ) {
-            $this->logger->addInfo('Order cannot be invoiced');
+        if (!$order->canInvoice() || $order->getState() != OrderEntity::STATE_PROCESSING) {
+            $this->logger->log('Order cannot be invoiced');
             if ($this->apiConfig->isLoggingEnabled()) {
                 $this->apiOrderLogger->logInvoice($order);
             }
@@ -162,9 +154,7 @@ class AutoInvoice implements ObserverInterface
         );
 
         if (!$invoice->getTotalQty()) {
-            $this->logger->addInfo(
-                __('Cannot create an invoice without products')
-            );
+            $this->logger->log(__('Cannot create an invoice without products'));
 
             return false;
         }
@@ -180,37 +170,22 @@ class AutoInvoice implements ObserverInterface
                     false
                 );
 
-            $this->state->emulateAreaCode(
-                'adminhtml',
-                [$invoice, 'register']
-            );
+            $this->state->emulateAreaCode('adminhtml', [$invoice, 'register']);
         } catch (\Exception $e) {
-            $this->logger->addInfo(
-                sprintf(
-                    __("Error creating invoice: %s"),
-                    $e->getMessage()
-                )
-            );
+            $this->logger->logException(sprintf(__("Error creating invoice: %s"), $e->getMessage()));
             return false;
         }
         try {
             $this->invoiceRepository->save($invoice);
-            if($order->getState() != OrderEntity::STATE_PROCESSING) {
+            if ($order->getState() != OrderEntity::STATE_PROCESSING) {
                 $this->orderRepository->save($invoice->getOrder());
             }
         } catch (\Exception $e) {
-            $this->logger->addCritical(
-                sprintf(
-                    __('Error creating transaction: %s'),
-                    $e->getMessage()
-                )
-            );
+            $this->logger->logException(sprintf(__('Error creating transaction: %s'), $e->getMessage()));
 
             return false;
         }
-        $this->logger->addInfo(
-            __("Transaction saved")
-        );
+        $this->logger->log(__("Transaction saved"));
     }
 
     /**

@@ -3,6 +3,7 @@ namespace Riskified\Decider\Model\Api;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use \Magento\Store\Model\ScopeInterface as ScopeInterface;
+use Riskified\Decider\Model\Config\Source\LogOptions;
 
 class Config
 {
@@ -149,13 +150,18 @@ class Config
         );
     }
 
-    public function isLoggingEnabled()
+    public function getLoggingOptionLevel()
     {
-        return (bool)$this->_scopeConfig->getValue(
-            'riskified/riskified/debug_logs',
+        return (int) $this->_scopeConfig->getValue(
+            'riskified/riskified/log_option_level',
             ScopeInterface::SCOPE_STORES,
             $this->getStore()
         );
+    }
+
+    public function isLoggingEnabled()
+    {
+        return $this->getLoggingOptionLevel() !== LogOptions::NONE_LOG_OPTION;
     }
 
     public function isAutoInvoiceEnabled()

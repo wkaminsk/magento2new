@@ -2,45 +2,36 @@
 
 namespace Riskified\Decider\Model\Observer;
 
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Riskified\Decider\Model\Logger\Order as OrderLogger;
-use Riskified\Decider\Model\Api\Order as ApiOrder;
+use Riskified\Decider\Model\Api\Log;
 
 class CollectPaymentInfo implements ObserverInterface
 {
     /**
-     * @var OrderLogger
+     * @var Log
      */
-    private $_logger;
+    private $logger;
 
     /**
-     * @var ApiOrder
+     * @param Log $logger
      */
-    private $_orderApi;
-
-    /**
-     * CollectPaymentInfo constructor.
-     *
-     * @param OrderLogger $logger
-     * @param ApiOrder $orderApi
-     */
-    public function __construct(
-        OrderLogger $logger,
-        ApiOrder $orderApi
-    ) {
-        $this->_logger = $logger;
-        $this->_orderApi = $orderApi;
+    public function __construct(Log $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
+        $this->logger->log(__("Collect Payment Info action"), 2);
         $payment = $observer->getQuote()->getPayment();
         $cc_bin = substr($payment->getCcNumber(), 0, 6);
         if ($cc_bin) {
             $payment->setAdditionalInformation('riskified_cc_bin', $cc_bin);
+            $this->logger->log(__("Added riskified_cc_bin = %1", $cc_bin), 2);
         }
     }
 }

@@ -2,16 +2,17 @@
 
 namespace Riskified\Decider\Model\Observer;
 
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Riskified\Decider\Model\Api\Api;
-use Riskified\Decider\Model\Logger\Order as OrderLogger;
+use Riskified\Decider\Model\Api\Log;
 use Riskified\Decider\Model\Api\Order as OrderApi;
 use Magento\Sales\Api\OrderRepositoryInterface;
 
 class SalesOrderAddressUpdate implements ObserverInterface
 {
     /**
-     * @var OrderLogger
+     * @var Log
      */
     private $logger;
 
@@ -26,14 +27,12 @@ class SalesOrderAddressUpdate implements ObserverInterface
     private $orderRepository;
 
     /**
-     * SalesOrderAddressUpdate constructor.
-     *
-     * @param OrderLogger $logger
+     * @param Log $logger
      * @param OrderApi $orderApi
      * @param OrderRepositoryInterface $orderRepository
      */
     public function __construct(
-        OrderLogger $logger,
+        Log $logger,
         OrderApi $orderApi,
         OrderRepositoryInterface $orderRepository
     ) {
@@ -43,9 +42,9 @@ class SalesOrderAddressUpdate implements ObserverInterface
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         try {
             $order_id = $observer->getOrderId();
@@ -55,9 +54,11 @@ class SalesOrderAddressUpdate implements ObserverInterface
                 return;
             }
 
+            $this->logger->log(__("Running update order address, order: #%1", $order->getIncrementId(), 2));
+
             $this->apiOrder->post($order, Api::ACTION_UPDATE);
         } catch (\Exception $e) {
-            $this->logger->critical($e);
+            $this->logger->logException($e);
         }
     }
 }

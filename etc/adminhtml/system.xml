@@ -151,11 +151,10 @@
                         <field id="*/riskified_general/enabled">1</field>
                     </depends>
                 </field>
-                <field id="debug_logs" translate="label" type="select" sortOrder="130" showInDefault="1"
-                       showInWebsite="1" showInStore="1">
-                    <label>Debug logs</label>
-                    <comment><![CDATA[Should this invoice be captured online or offline?]]></comment>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <field id="log_option_level" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Debug logs Option</label>
+                    <source_model>Riskified\Decider\Model\Config\Source\LogOptions</source_model>
+                    <comment><![CDATA[Choose debug logs option.]]></comment>
                     <depends>
                         <field id="*/riskified_general/enabled">1</field>
                     </depends>

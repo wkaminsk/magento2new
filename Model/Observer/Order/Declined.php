@@ -5,24 +5,20 @@ namespace Riskified\Decider\Model\Observer\Order;
 use Magento\Framework\App\State;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\Model\Context;
 use Magento\Framework\Mail\Template\TransportBuilder;
+use Magento\Framework\Model\Context;
 use Magento\Framework\Translate\Inline\StateInterface;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\Escaper;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Service\InvoiceService;
+use Magento\Store\Model\StoreManagerInterface;
 use Riskified\Decider\Model\Api\Config;
+use Riskified\Decider\Model\Api\Log;
 use Riskified\Decider\Model\Api\Order as OrderApi;
-use Riskified\Decider\Model\Api\Order\Log;
-use Riskified\Decider\Model\Logger\Order;
-use \Magento\Sales\Api\OrderRepositoryInterface;
 
 class Declined implements ObserverInterface
 {
     /**
-     * Module main logger class.
-     *
-     * @var Order
+     * @var Log
      */
     protected $logger;
 
@@ -32,13 +28,6 @@ class Declined implements ObserverInterface
      * @var OrderApi
      */
     protected $apiOrder;
-
-    /**
-     * Api logger.
-     *
-     * @var Log
-     */
-    protected $apiOrderLogger;
 
     /**
      * Module config.
@@ -69,24 +58,19 @@ class Declined implements ObserverInterface
     protected $state;
 
     /**
-     * @var \Magento\Framework\Mail\Template\TransportBuilder
+     * @var TransportBuilder
      */
     private $transportBuilder;
 
     /**
-     * @var \Magento\Framework\Translate\Inline\StateInterface
+     * @var StateInterface
      */
     private $inlineTranslation;
 
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
+     * @var StoreManagerInterface
      */
     private $storeManager;
-
-    /**
-     * @var \Magento\Framework\Escaper
-     */
-    private $escaper;
 
     /**
      * @var OrderRepositoryInterface
@@ -94,19 +78,18 @@ class Declined implements ObserverInterface
     private $orderRepository;
 
     /**
-     * AutoInvoice constructor.
-     *
-     * @param Log                  $apiOrderLogger
-     * @param Order                $logger
-     * @param Config               $apiConfig
-     * @param OrderApi             $orderApi
-     * @param InvoiceService       $invoiceService
-     * @param OrderRepositoryInterface       $orderRepository
-     * @param Context              $context
+     * @param Log $logger
+     * @param Config $apiConfig
+     * @param OrderApi $orderApi
+     * @param InvoiceService $invoiceService
+     * @param Context $context
+     * @param TransportBuilder $transportBuilder
+     * @param StateInterface $inlineTranslation
+     * @param StoreManagerInterface $storeManager
+     * @param OrderRepositoryInterface $orderRepository
      */
     public function __construct(
-        Log $apiOrderLogger,
-        Order $logger,
+        Log $logger,
         Config $apiConfig,
         OrderApi $orderApi,
         InvoiceService $invoiceService,
@@ -114,40 +97,37 @@ class Declined implements ObserverInterface
         TransportBuilder $transportBuilder,
         StateInterface $inlineTranslation,
         StoreManagerInterface $storeManager,
-        OrderRepositoryInterface $orderRepository,
-        Escaper $escaper
+        OrderRepositoryInterface $orderRepository
     ) {
         $this->logger = $logger;
         $this->context = $context;
         $this->apiOrder = $orderApi;
         $this->apiConfig = $apiConfig;
-        $this->apiOrderLogger = $apiOrderLogger;
         $this->invoiceService = $invoiceService;
         $this->state = $context->getAppState();
         $this->transportBuilder = $transportBuilder;
         $this->inlineTranslation = $inlineTranslation;
         $this->storeManager = $storeManager;
         $this->orderRepository = $orderRepository;
-        $this->escaper = $escaper;
     }
 
     /**
-     * Observer execute
-     *
      * @param Observer $observer
      *
-     * @return $this
+     * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         $order = $observer->getOrder();
 
+        $this->logger->log(__("Initializing Decline for Order: #%1", $order->getIncrementId()), 2);
+
         if (!$this->apiConfig->isDeclineNotificationEnabled()) {
-            return $this;
+            return;
         }
 
         if ($order->getDeclineNotificationSent()) {
-            return $this;
+            return;
         }
 
         $subject = $this->apiConfig->getDeclineNotificationSubject();
@@ -218,7 +198,7 @@ class Declined implements ObserverInterface
                 $order->getCustomerEmail()
             );
 
-            $this->logger->info($fileLog);
+            $this->logger->log($fileLog, 2);
 
             $order
                 ->addStatusHistoryComment($orderComment)
@@ -228,7 +208,7 @@ class Declined implements ObserverInterface
 
             $this->orderRepository->save($order);
         } catch (\Exception $e) {
-            $this->logger->critical($e->getMessage());
+            $this->logger->logException($e->getMessage());
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace Riskified\Decider\Model\Observer;
 
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Riskified\Decider\Model\Api\Api;
 use Riskified\Decider\Model\Api\Log as LogApi;
@@ -34,11 +35,12 @@ class OrderPaymentVoid implements ObserverInterface
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         $order = $observer->getPayment()->getOrder();
+        $this->logger->log(__("Running Void Payment for order #%1", $order->getIncrementId()), 2);
         $this->apiOrderLayer->post($order, Api::ACTION_CANCEL);
     }
 }
