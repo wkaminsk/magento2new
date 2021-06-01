@@ -3,7 +3,9 @@
 namespace Riskified\Decider\Model\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Sales\Model\Order as Order;
+use Magento\Sales\Model\Order;
+use Magento\Framework\Registry;
+use Magento\Framework\Event\Observer;
 use Riskified\Decider\Model\Api\Api;
 use Riskified\Decider\Model\Api\Order as OrderApi;
 use Riskified\Decider\Model\Logger\Order as OrderLogger;
@@ -20,7 +22,7 @@ class OrderSaveAfter implements ObserverInterface
      */
     private $_orderApi;
     /**
-     * @var \Magento\Framework\Registry
+     * @var Registry
      */
     protected $_registry;
 
@@ -29,12 +31,12 @@ class OrderSaveAfter implements ObserverInterface
      *
      * @param OrderLogger $logger
      * @param OrderApi $orderApi
-     * @param \Magento\Framework\Registry $registry
+     * @param  $registry
      */
     public function __construct(
         OrderLogger $logger,
         OrderApi $orderApi,
-        \Magento\Framework\Registry $registry
+        Registry $registry
     ) {
         $this->_logger = $logger;
         $this->_orderApi = $orderApi;
@@ -42,9 +44,9 @@ class OrderSaveAfter implements ObserverInterface
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
         $order = $observer->getOrder();
 

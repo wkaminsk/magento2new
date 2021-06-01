@@ -366,9 +366,7 @@ class Helper
      */
     protected function getPreparedLineItem($item)
     {
-        $prod_type = null;
-
-        $prod_type = null;
+        $prod_type = "physical";
         $category = null;
         $sub_categories = null;
         $brand = null;
@@ -399,7 +397,11 @@ class Helper
             }
         }
 
-        $line_item = new Model\LineItem(array_filter([
+        if ($item->getIsVirtual()) {
+            $prod_type = "digital";
+        }
+
+        $line_item = new Model\LineItem(array_filter(array(
             'price' => floatval($item->getPrice()),
             'quantity' => intval($item->getQtyOrdered()),
             'title' => $item->getName(),
@@ -409,8 +411,9 @@ class Helper
             'product_type' => $prod_type,
             'brand' => $brand,
             'category' => (isset($categories) && !empty($categories)) ? implode('|', $categories) : '',
-            'sub_category' => (isset($sub_categories) && !empty($sub_categories)) ? implode('|', $sub_categories) : ''
-        ], 'strlen'));
+            'sub_category' => (isset($sub_categories) && !empty($sub_categories)) ? implode('|', $sub_categories) : '',
+            'requires_shipping' => (bool)!$item->getIsVirtual()
+        ), 'strlen'));
 
         return $line_item;
     }

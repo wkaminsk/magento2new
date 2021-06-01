@@ -2,7 +2,6 @@
 
 namespace Riskified\Decider\Model\Api;
 
-use Magento\Checkout\Model\Session;
 use Riskified\OrderWebhook\Model;
 use Riskified\Decider\Model\DateFormatter;
 
@@ -142,10 +141,10 @@ class Order
             throw new \Exception("Order doesn't not exists");
         }
         $this->_orderHelper->setOrder($order);
-        $eventData = array(
+        $eventData = [
             'order' => $order,
             'action' => $action
-        );
+        ];
         try {
             switch ($action) {
                 case Api::ACTION_CREATE:
@@ -181,6 +180,10 @@ class Order
                     $orderForTransport = $this->loadRefund();
                     $this->logger->log(serialize($orderForTransport));
                     $response = $transport->refundOrder($orderForTransport);
+                    break;
+                case Api::ACTION_CHECKOUT_DENIED:
+                    $checkoutForTransport = $this->loadQuote($order);
+                    $response = $transport->deniedCheckout($checkoutForTransport);
                     break;
             }
             $eventData['response'] = $response;
@@ -229,12 +232,12 @@ class Order
      */
     private function _raiseOrderUpdateEvent($order, $status, $oldStatus, $description)
     {
-        $eventData = array(
+        $eventData = [
             'order' => $order,
             'status' => $status,
             'old_status' => $oldStatus,
             'description' => $description
-        );
+        ];
         $this->_eventManager->dispatch(
             'riskified_decider_order_update',
             $eventData
@@ -264,6 +267,58 @@ class Order
         return $refund;
     }
 
+    private function loadQuote($model)
+    {
+        $gateway = 'unavailable';
+        if ($model->getPayment()) {
+            $gateway = $model->getPayment()->getMethod();
+        }
+        $order_array = [
+            'id' => (int) $model->getQuoteId(),
+            'name' => $model->getIncrementId(),
+            'email' => $model->getCustomerEmail(),
+            'created_at' => $this->_orderHelper->formatDateAsIso8601($model->getCreatedAt()),
+            'currency' => $model->getOrderCurrencyCode(),
+            'updated_at' => $this->_orderHelper->formatDateAsIso8601($model->getUpdatedAt()),
+            'gateway' => $gateway,
+            'browser_ip' => $this->_orderHelper->getRemoteIp(),
+            'note' => $model->getCustomerNote(),
+            'total_price' => $model->getGrandTotal(),
+            'total_discounts' => $model->getDiscountAmount(),
+            'subtotal_price' => $model->getBaseSubtotalInclTax(),
+            'discount_codes' => $this->_orderHelper->getDiscountCodes($model),
+            'taxes_included' => true,
+            'total_tax' => $model->getBaseTaxAmount(),
+            'total_weight' => $model->getWeight(),
+            'cancelled_at' => $this->_orderHelper->formatDateAsIso8601($this->_orderHelper->getCancelledAt()),
+            'financial_status' => $model->getState(),
+            'fulfillment_status' => $model->getStatus(),
+            'vendor_id' => $model->getStoreId(),
+            'vendor_name' => $model->getStoreName(),
+            'cart_token' => $this->session->getSessionId()
+        ];
+
+        if ($this->_orderHelper->getCustomerSession()->isLoggedIn()) {
+            unset($order_array['browser_ip']);
+            unset($order_array['cart_token']);
+        }
+        $payload = array_filter($order_array, 'strlen');
+
+        $order = new Model\Checkout($payload);
+
+        $order->customer = $this->_orderHelper->getCustomer();
+        $order->shipping_address = $this->_orderHelper->getShippingAddress();
+        $order->billing_address = $this->_orderHelper->getBillingAddress();
+        $order->payment_details = $this->_orderHelper->getPaymentDetails();
+        $order->line_items = $this->_orderHelper->getLineItems();
+        $order->shipping_lines = $this->_orderHelper->getShippingLines();
+
+        if (!$this->_backendAuthSession->isLoggedIn()) {
+            $order->client_details = $this->_orderHelper->getClientDetails();
+        }
+        return $order;
+    }
+
     /**
      * @param $model
      *
@@ -276,15 +331,15 @@ class Order
         if ($model->getPayment()) {
             $gateway = $model->getPayment()->getMethod();
         }
-        if(is_null($model->getRiskifiedCartToken())){
+        if (is_null($model->getRiskifiedCartToken())) {
             $cartToken = $this->session->getSessionId();
             //save card_token into db
             $model->setRiskifiedCartToken($cartToken);
             $model->save();
-        }else{
+        } else {
             $cartToken = $model->getRiskifiedCartToken();
         }
-        $order_array = array(
+        $order_array = [
             'id' => $this->_orderHelper->getOrderOrigId(),
             'name' => $model->getIncrementId(),
             'email' => $model->getCustomerEmail(),
@@ -294,28 +349,23 @@ class Order
             'gateway' => $gateway,
             'browser_ip' => $this->_orderHelper->getRemoteIp(),
             'note' => $model->getCustomerNote(),
-            'total_price' => $model->getGrandTotal(),
+            'total_price' => floatval($model->getGrandTotal()),
             'total_discounts' => $model->getDiscountAmount(),
-            'subtotal_price' => $model->getBaseSubtotalInclTax(),
-            'discount_codes' => $this->_orderHelper->getDiscountCodes($model),
-            'taxes_included' => true,
-            'total_tax' => $model->getBaseTaxAmount(),
-            'total_weight' => $model->getWeight(),
-            'cancelled_at' => $this->formatDateAsIso8601($this->_orderHelper->getCancelledAt()),
             'financial_status' => $model->getState(),
             'fulfillment_status' => $model->getStatus(),
+            'discount_codes' => $this->_orderHelper->getDiscountCodes(),
+            'cancelled_at' => $this->_orderHelper->formatDateAsIso8601($this->_orderHelper->getCancelledAt()),
             'vendor_id' => strval($model->getStoreId()),
             'vendor_name' => $model->getStoreName(),
             'cart_token' => $cartToken
-        );
-
+        ];
 
         if ($this->_orderHelper->isAdmin()) {
             unset($order_array['browser_ip']);
             unset($order_array['cart_token']);
             $order_array['source'] = 'admin';
         } else {
-            $order_array['source'] = 'web';
+            $order_array['source'] = 'desktop_web';
         }
 
         $order = new Model\Order(array_filter($order_array, 'strlen'));
@@ -353,12 +403,12 @@ class Order
 
         $this->logger->log('Dispatching event for order ' . $order->getId() . ' with status "' . $status .
             '" old status "' . $oldStatus . '" and description "' . $description . '"');
-        $eventData = array(
+        $eventData = [
             'order' => $order,
             'status' => $status,
             'old_status' => $oldStatus,
             'description' => $description
-        );
+        ];
 
         $this->_eventManager->dispatch(
             'riskified_decider_order_update',
@@ -446,7 +496,7 @@ class Order
         if (!$this->_apiConfig->isEnabled()) {
             return;
         }
-        $orders = array();
+        $orders = [];
 
         foreach ($models as $model) {
             $orders[] = $this->getOrder($model);
@@ -471,11 +521,11 @@ class Order
 
             if ($existingRetries->getSize() == 0) {
                 $queue = $this->queueFactory->create();
-                $queue->addData(array(
+                $queue->addData([
                     'order_id' => $order->getId(),
                     'action' => $action,
                     'updated_at' => $this->date->gmtDate()
-                ))->save();
+                ])->save();
 
                 $this->logger->log("New retry scheduled successfully");
             }
