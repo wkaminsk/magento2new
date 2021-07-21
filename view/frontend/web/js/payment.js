@@ -18,7 +18,8 @@ define([
     'Magento_Checkout/js/model/payment/additional-validators',
     'Magento_Ui/js/model/messages',
     'uiLayout',
-    'Magento_Checkout/js/action/redirect-on-success'
+    'Magento_Checkout/js/action/redirect-on-success',
+    'mage/storage'
 ], function (
     ko,
     $,
@@ -34,7 +35,8 @@ define([
     additionalValidators,
     Messages,
     layout,
-    redirectOnSuccessAction
+    redirectOnSuccessAction,
+    storage
 ) {
     'use strict';
 
@@ -76,7 +78,7 @@ define([
         triggerCheckoutDeniedCall: function()
         {
             storage.post(
-                'decider/checkout/checkoutDenied',
+                'decider/checkout/deny',
                 JSON.stringify({
                     quote_id: quote.getQuoteId()
                 }),

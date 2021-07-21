@@ -298,7 +298,7 @@ class Order
             'cart_token' => $this->session->getSessionId()
         ];
 
-        if ($this->_orderHelper->getCustomerSession()->isLoggedIn()) {
+        if ($this->_orderHelper->getCustomerSession() && $this->_orderHelper->getCustomerSession()->isLoggedIn()) {
             unset($order_array['browser_ip']);
             unset($order_array['cart_token']);
         }
