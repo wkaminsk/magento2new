@@ -183,6 +183,7 @@ class Order
                     break;
                 case Api::ACTION_CHECKOUT_DENIED:
                     $checkoutForTransport = $this->loadQuote($order);
+                    $this->logger->log(serialize($checkoutForTransport));
                     $response = $transport->deniedCheckout($checkoutForTransport);
                     break;
             }
@@ -273,8 +274,9 @@ class Order
         if ($model->getPayment()) {
             $gateway = $model->getPayment()->getMethod();
         }
+
         $order_array = [
-            'id' => (int) $model->getQuoteId(),
+            'id' => (int) $model->getId(),
             'name' => $model->getIncrementId(),
             'email' => $model->getCustomerEmail(),
             'created_at' => $this->_orderHelper->formatDateAsIso8601($model->getCreatedAt()),
@@ -292,7 +294,6 @@ class Order
             'total_weight' => $model->getWeight(),
             'cancelled_at' => $this->_orderHelper->formatDateAsIso8601($this->_orderHelper->getCancelledAt()),
             'financial_status' => $model->getState(),
-            'fulfillment_status' => $model->getStatus(),
             'vendor_id' => $model->getStoreId(),
             'vendor_name' => $model->getStoreName(),
             'cart_token' => $this->session->getSessionId()
@@ -303,7 +304,7 @@ class Order
             unset($order_array['cart_token']);
         }
         $payload = array_filter($order_array, 'strlen');
-
+// var_dump($payload);
         $order = new Model\Checkout($payload);
 
         $order->customer = $this->_orderHelper->getCustomer();
@@ -311,7 +312,6 @@ class Order
         $order->billing_address = $this->_orderHelper->getBillingAddress();
         $order->payment_details = $this->_orderHelper->getPaymentDetails();
         $order->line_items = $this->_orderHelper->getLineItems();
-        $order->shipping_lines = $this->_orderHelper->getShippingLines();
 
         if (!$this->_backendAuthSession->isLoggedIn()) {
             $order->client_details = $this->_orderHelper->getClientDetails();

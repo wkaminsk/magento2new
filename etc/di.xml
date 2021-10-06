@@ -26,13 +26,6 @@
         <plugin name="riskified_decider_sales_order_view_toolbar_send_button"
                 type="Riskified\Decider\Plugin\Widget\Context" sortOrder="1"/>
     </type>
-    <type name="Magento\Framework\Console\CommandListInterface">
-        <arguments>
-            <argument name="commands" xsi:type="array">
-                <item name="riskfied_send_historical_orders" xsi:type="object">Riskified\Decider\Model\Command\UploadHistoricalOrders</item>
-            </argument>
-        </arguments>
-    </type>
     <type name="Magento\Customer\Api\AccountManagementInterface">
         <plugin name="riskfied_validate_customer_login" type="Riskified\Decider\Plugin\Customer\AccountManagementPlugin"/>
     </type>
@@ -45,4 +38,18 @@
         for="Riskified\Decider\Api\SessionDetailsInterface"
         type="Riskified\Decider\Model\Api\Data\SessionDetails"
     />
+    <virtualType name="BraintreeAuthorizationHandler">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="decider_3ds" xsi:type="string">Riskified\Decider\Model\Gateway\Braintree\Response\ThreeDSecureDetailsHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="BraintreeVaultResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="decider_3ds" xsi:type="string">Riskified\Decider\Model\Gateway\Braintree\Response\ThreeDSecureDetailsHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>
