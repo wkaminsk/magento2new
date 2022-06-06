@@ -155,7 +155,12 @@
                        showInWebsite="1" showInStore="1">
                     <label>Sync customer login</label>
                     <comment><![CDATA[Send information about customer login status (login successful, login failed to Riskified API.)]]></comment>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+		    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	    </field>
+                <field id="delay" translate="label" type="text" sortOrder="140" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Decision delay</label>
+                    <comment><![CDATA[Value in seconds. <br> Add delay to processing decision endpoint to overcome issues with overlapping databasa transactions. DEV ONLY.]]></comment>
                     <depends>
                         <field id="*/riskified_general/enabled">1</field>
                     </depends>
