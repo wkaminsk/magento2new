@@ -17,19 +17,9 @@ class Order
     private $_orderHelper;
 
     /**
-     * @var \Magento\Framework\App\Helper\Context
-     */
-    private $_context;
-
-    /**
      * @var \Magento\Framework\Event\ManagerInterface
      */
     private $_eventManager;
-
-    /**
-     * @var \Magento\Framework\Message\ManagerInterface
-     */
-    private $_messageManager;
 
     /**
      * @var \Magento\Backend\Model\Auth\Session
@@ -66,6 +56,8 @@ class Order
      */
     private $session;
 
+    private $request;
+
     /**
      * Order constructor.
      *
@@ -94,6 +86,7 @@ class Order
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\Session\SessionManager $sessionManager,
+        \Magento\Framework\App\RequestInterface $request,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
     ) {
         $this->_api = $api;
@@ -109,6 +102,7 @@ class Order
         $this->queueFactory = $queueFactory;
         $this->orderRepository = $orderRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->request = $request;
 
         $this->_orderHelper->setCheckoutSession($checkoutSession);
 
@@ -355,12 +349,29 @@ class Order
             'cart_token' => $cartToken
         ];
 
+        $order_array['source'] = 'web';
+
+        $userAgent = $this->request->getHeader('useragent');
+        $server    = $this->request->getServer();
+
+        $isDesktopDevice = \Zend_Http_UserAgent_Desktop::match($userAgent, $server);
+
+        if ($isDesktopDevice) {
+            $order_array['source'] = 'desktop_web';
+        }
+
+        $isMobileDevice = \Zend_Http_UserAgent_Mobile::match($userAgent, $server);
+        if ($isMobileDevice) {
+            $order_array['source'] = 'mobile_web';
+        }
+
         if ($this->_orderHelper->isAdmin()) {
             unset($order_array['browser_ip']);
             unset($order_array['cart_token']);
-            $order_array['source'] = 'admin';
         } else {
-            $order_array['source'] = 'desktop_web';
+            if ($model->getStoreId() == 0) {
+                $order_array['source'] = 'phone';
+            }
         }
 
         $order = new Model\Order(array_filter($order_array, 'strlen'));
