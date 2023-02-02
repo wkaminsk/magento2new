@@ -125,6 +125,7 @@ class UpdateOrderState implements ObserverInterface
                     && ($currentStatus == $this->apiOrderConfig->getOnHoldStatusCode()
                         || $currentStatus == $this->apiOrderConfig->getTransportErrorStatusCode())
                 ) {
+                    $this->logger->log("Order #{$order->getIncrementId()} was approved.");
                     $newState = $this->apiOrderConfig->getSelectedApprovedState();
                     $newStatus = $this->apiOrderConfig->getSelectedApprovedStatus();
                 }
@@ -134,6 +135,7 @@ class UpdateOrderState implements ObserverInterface
                     && ($currentStatus == $this->apiOrderConfig->getOnHoldStatusCode()
                         || $currentStatus == $this->apiOrderConfig->getTransportErrorStatusCode())
                 ) {
+                    $this->logger->log("Order #{$order->getIncrementId()} was declined.");
                     $newState = $this->apiOrderConfig->getSelectedDeclinedState();
                     $newStatus = $this->apiOrderConfig->getSelectedDeclinedStatus();
                 }
@@ -190,8 +192,8 @@ class UpdateOrderState implements ObserverInterface
 
                 $this->logger->log(
                     sprintf(
-                        "Updated order '%s' to: state:  '%s', status: '%s', description: '%s'",
-                        $order->getId(),
+                        "Updated order #%s. State: '%s', status: '%s', description: '%s'",
+                        $order->getIncrementId(),
                         $newState,
                         $newStatus,
                         $description
@@ -202,13 +204,8 @@ class UpdateOrderState implements ObserverInterface
             $changed = true;
         } elseif ($description && $riskifiedStatus != $riskifiedOldStatus) {
             if ($riskifiedStatus != 'approved' || ! $this->apiConfig->isAutoInvoiceEnabled()) {
-                $this->logger->log(
-                    sprintf(
-                        "Updated order %s history comment to: %s",
-                        $order->getId(),
-                        $description
-                    )
-                );
+                $this->logger->log("No status change for #{$order->getIncrementId()}. Adding only comment to history. Status: {$order->getStatus()}, state: {$order->getState()}");
+                $this->logger->log("Updated order {$order->getIncrementId()} history comment to: ". $description);
                 $order->addCommentToStatusHistory($description);
                 $changed = true;
             }
