@@ -246,6 +246,9 @@ class Order
             'old_status' => $oldStatus,
             'description' => $description
         ];
+
+        $this->logger->log("Dispatching update action for order #{$order->getIncrementId()}, status: {$order->getStatus()}, status: {$order->getState()}");
+
         $this->_eventManager->dispatch(
             'riskified_decider_order_update',
             $eventData
@@ -410,6 +413,7 @@ class Order
 
         $this->logger->log('Dispatching event for order ' . $order->getId() . ' with status "' . $status .
             '" old status "' . $oldStatus . '" and description "' . $description . '"');
+
         $eventData = [
             'order' => $order,
             'status' => $status,
@@ -417,10 +421,13 @@ class Order
             'description' => $description
         ];
 
+        $this->logger->log("Dispatching update action for order #{$order->getIncrementId()}, status: {$order->getStatus()}, status: {$order->getState()}");
+
         $this->_eventManager->dispatch(
             'riskified_decider_order_update',
             $eventData
         );
+
         $eventIdentifier = preg_replace("/[^a-z]/", '_', strtolower($status));
         $this->_eventManager->dispatch(
             'riskified_decider_order_update_' . $eventIdentifier,

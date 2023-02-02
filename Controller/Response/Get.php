@@ -142,6 +142,8 @@ class Get extends \Magento\Framework\App\Action\Action
 
                     $this->decisionRepository->save($decision);
 
+                    $logger->log("Processing #{$order->getIncrementId()} decision. Order status: {$order->getStatus()}, state: {$order->getState()}");
+
                     $this->apiOrderLayer->update(
                         $order,
                         $notification->status,
