@@ -9,6 +9,7 @@ use Riskified\Decider\Model\Api\Order\PaymentProcessor\AdyenHpp;
 use Riskified\Decider\Model\Api\Order\PaymentProcessor\Authcim;
 use Riskified\Decider\Model\Api\Order\PaymentProcessor\Braintree;
 use Riskified\Decider\Model\Api\Order\PaymentProcessor\Cryozonic;
+use Riskified\Decider\Model\Api\Order\PaymentProcessor\Cybersource;
 use Riskified\Decider\Model\Api\Order\PaymentProcessor\DefaultPaymentProcessor;
 use Riskified\Decider\Model\Api\Order\PaymentProcessor\DirectPost;
 use Riskified\Decider\Model\Api\Order\PaymentProcessor\OptimalHosted;
@@ -44,7 +45,8 @@ class PaymentProcessorFactory
         'adyen_hpp' => AdyenHpp::class,
         'cryozonic_stripe' => Cryozonic::class,
         'vantiv_cc' => Vantiv::class,
-        'stripe_payments' => Stripe::class
+        'stripe_payments' => Stripe::class,
+        'cybersource' => Cybersource::class,
     ];
 
     /**
