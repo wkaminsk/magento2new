@@ -46,7 +46,8 @@ class PaymentProcessorFactory
         'cryozonic_stripe' => Cryozonic::class,
         'vantiv_cc' => Vantiv::class,
         'stripe_payments' => Stripe::class,
-        'checkoutcom_card_payment' => Checkoutcom::class
+        'checkoutcom_card_payment' => Checkoutcom::class,
+        'checkoutcom_vault' => Checkoutcom::class,
     ];
 
     /**

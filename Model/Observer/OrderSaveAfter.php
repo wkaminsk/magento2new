@@ -70,7 +70,9 @@ class OrderSaveAfter implements ObserverInterface
 
             // processing order for checkoutcom
             if ($oldState == 'new' && $newState == Order::STATE_PROCESSING) {
-                if ($order->getPayment()->getMethod() == "checkoutcom_card_payment" && !empty($order->getPayment()->getLastTransId())) {
+                if (
+                    ($order->getPayment()->getMethod() == "checkoutcom_card_payment" || $order->getPayment()->getMethod() == "checkoutcom_card_payment")
+                    && !empty($order->getPayment()->getLastTransId())) {
                     $this->_logger->log("Order #{$order->getIncrementId()} changed status from pending to processing and paid with checkoutcom. Attempting to send to Riskified.");
                     $this->_registry->unregister("riskified-order");
                     $this->submitOrder($order);
