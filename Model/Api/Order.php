@@ -73,6 +73,11 @@ class Order
     private $registry;
 
     /**
+     * @var Config
+     */
+    private $_apiConfig;
+
+    /**
      * Order constructor.
      *
      * @param Api $api
@@ -286,7 +291,7 @@ class Order
             'id' => (int) $model->getId(),
             'name' => $model->getIncrementId(),
             'email' => $model->getCustomerEmail(),
-            'created_at' => $this->_orderHelper->formatDateAsIso8601($model->getCreatedAt()),
+            'created_at' => $this->_orderHelper->formatDateAsIso8601($model->getCreatedAt() ? $model->getCreatedAt() : date("Y-m-d H:i:s")),
             'currency' => $model->getOrderCurrencyCode(),
             'updated_at' => $this->_orderHelper->formatDateAsIso8601($model->getUpdatedAt()),
             'gateway' => $gateway,

@@ -6,12 +6,14 @@
                 <env>DEV</env>
                 <cron_max_attempts>5</cron_max_attempts>
             </riskified>
-
             <decline_notification>
                 <email_identity>general</email_identity>
                 <title>{{store_name}}: Order # {{order_increment_id}} has been declined by Riskified</title>
                 <content><![CDATA[We regret to inform you that your recent order #{{order_increment_id}} for {{products}}  has been declined by Riskified service.]]></content>
             </decline_notification>
+            <delays>
+                <checkoutcom_card_payment>5</checkoutcom_card_payment>
+            </delays>
         </riskified>
     </default>
 </config>
