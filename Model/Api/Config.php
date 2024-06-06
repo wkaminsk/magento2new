@@ -301,4 +301,9 @@ class Config
     {
         return (int) $this->_scopeConfig->getValue('riskified/riskified/cron_max_attempts');
     }
+
+    public function getGatewayDelay(string $paymentGatewayCode) : int
+    {
+        return (int) $this->_scopeConfig->getValue("riskified/delays/$paymentGatewayCode");
+    }
 }

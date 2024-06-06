@@ -142,6 +142,12 @@ class Get extends \Magento\Framework\App\Action\Action
 
                     $this->decisionRepository->save($decision);
 
+                    $paymentGatewayDelay = $this->config->getGatewayDelay($order->getPayment()->getMethod());
+
+                    if ($paymentGatewayDelay) {
+                        sleep($paymentGatewayDelay);
+                    }
+
                     $this->apiOrderLayer->update(
                         $order,
                         $notification->status,

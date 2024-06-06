@@ -52,4 +52,9 @@
                 type="Riskified\Decider\Model\DecisionRepository"/>
     <preference for="Riskified\Decider\Api\Data\DecisionInterface"
                 type="Riskified\Decider\Data\DecisionInterface"/>
+
+    <type name="Magento\Sales\Model\ResourceModel\Order">
+        <plugin name="riskified_save_order_state_plugin"
+            type="Riskified\Decider\Plugin\ObserveOrderSavePlugin"/>
+    </type>
 </config>

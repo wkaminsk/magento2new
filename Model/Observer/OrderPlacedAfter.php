@@ -58,6 +58,10 @@ class OrderPlacedAfter implements ObserverInterface
             return;
         }
 
+        if ($order->getPayment()->getMethod() == "checkoutcom_card_payment") {
+            return;
+        }
+
         if (
             $order->dataHasChangedFor('state')
             || ($order->getPayment()->getMethod() == "worldpay_cc")

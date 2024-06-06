@@ -71,6 +71,7 @@ class Order
      * @var Registry
      */
     private $registry;
+    private $_apiConfig;
 
     /**
      * Order constructor.
@@ -342,6 +343,12 @@ class Order
         } else {
             $cartToken = $model->getRiskifiedCartToken();
         }
+        $state = $model->getState();
+
+        if ($state == "pending_payment" && $model->getPayment()->getMethod() == "checkoutcom_card_payment") {
+            $state = "processing";
+        }
+
         $order_array = [
             'id' => $this->_orderHelper->getOrderOrigId(),
             'name' => $model->getIncrementId(),
@@ -354,7 +361,7 @@ class Order
             'note' => $model->getCustomerNote(),
             'total_price' => floatval($model->getGrandTotal()),
             'total_discounts' => $model->getDiscountAmount(),
-            'financial_status' => $model->getState(),
+            'financial_status' => $state,
             'fulfillment_status' => $model->getStatus(),
             'discount_codes' => $this->_orderHelper->getDiscountCodes(),
             'cancelled_at' => $this->_orderHelper->formatDateAsIso8601($this->_orderHelper->getCancelledAt()),

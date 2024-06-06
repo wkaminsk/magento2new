@@ -54,24 +54,20 @@ class OrderSaveAfter implements ObserverInterface
             return;
         }
 
+        if ($order->getPayment()->getMethod() == "checkoutcom_card_payment") {
+            return;
+        }
+
         $newState = $order->getState();
+        $oldState = $order->getOrigData('state');
 
         if ((int)$order->dataHasChangedFor('state') === 1) {
-            $oldState = $order->getOrigData('state');
+            $this->_logger->log("Old state {$oldState}, new state {$newState}");
 
             // processing order for worldpay
             if ($oldState == 'new' && $newState == Order::STATE_PROCESSING) {
                 if ($order->getPayment()->getMethod() == "worldpay_cc") {
                     $this->_logger->log("Order #{$order->getIncrementId()} changed status from pending to processing and paid with worldpay. Attempting to send to Riskified.");
-                    $this->_registry->unregister("riskified-order");
-                    $this->submitOrder($order);
-                }
-            }
-
-            // processing order for checkoutcom
-            if ($oldState == 'new' && $newState == Order::STATE_PROCESSING) {
-                if ($order->getPayment()->getMethod() == "checkoutcom_card_payment" && !empty($order->getPayment()->getLastTransId())) {
-                    $this->_logger->log("Order #{$order->getIncrementId()} changed status from pending to processing and paid with checkoutcom. Attempting to send to Riskified.");
                     $this->_registry->unregister("riskified-order");
                     $this->submitOrder($order);
                 }

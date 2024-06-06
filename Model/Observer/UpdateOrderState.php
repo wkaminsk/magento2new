@@ -133,7 +133,7 @@ class UpdateOrderState implements ObserverInterface
             case 'approved':
                 if (($currentState == Order::STATE_HOLDED
                         || $currentState == Order::STATE_PAYMENT_REVIEW
-                        || $currentState == Order::STATE_PENDING_PAYMENT)
+                        || $currentStatus == Order::STATE_PENDING_PAYMENT)
                 ) {
                     $newState = $this->apiOrderConfig->getSelectedApprovedState();
                     $newStatus = $this->apiOrderConfig->getSelectedApprovedStatus();
@@ -150,10 +150,13 @@ class UpdateOrderState implements ObserverInterface
                 break;
             case 'submitted':
                 if ($currentState == Order::STATE_PROCESSING
-                    || $currentState == Order::STATE_PENDING_PAYMENT
                     || ($currentState == Order::STATE_HOLDED
                         && $currentStatus == $this->apiOrderConfig->getTransportErrorStatusCode())
                 ) {
+                    $newState = Order::STATE_HOLDED;
+                    $newStatus = $this->apiOrderConfig->getOnHoldStatusCode();
+                }
+                if ($currentStatus == "pending" && $order->getPayment()->getMethod() == "checkoutcom_card_payment") {
                     $newState = Order::STATE_HOLDED;
                     $newStatus = $this->apiOrderConfig->getOnHoldStatusCode();
                 }
