@@ -52,4 +52,8 @@
                 type="Riskified\Decider\Model\DecisionRepository"/>
     <preference for="Riskified\Decider\Api\Data\DecisionInterface"
                 type="Riskified\Decider\Data\DecisionInterface"/>
+
+    <type name="Magento\Sales\Model\Order\Email\Sender\OrderSender">
+        <plugin name="send_async_decline_order" type="Riskified\Decider\Plugin\Email\OrderSender" />
+    </type>
 </config>
