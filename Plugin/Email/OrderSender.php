@@ -33,6 +33,10 @@ class OrderSender {
             return $this;
         }
 
-        $this->declined->send($order);
+        foreach ($order->getStatusHistories() as $history) {
+            if (str_contains($history->getComment(), 'Order exhibits data points')) {
+                $this->declined->send($order);
+            }
+        }
     }
 }
