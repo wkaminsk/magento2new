@@ -471,7 +471,7 @@ class Helper
             foreach ($creditMemos->getData() as $memo) {
                 $refundObjectCollection[] = new Model\RefundDetails(array_filter([
                     'refund_id' => $memo['increment_id'],
-                    'amount' => $memo['subtotal'],
+                    'amount' => isset($memo['subtotal']) ? (float) $memo['subtotal'] : null,
                     'currency' => $memo['base_currency_code'],
                     'refunded_at' => $memo['created_at'],
                     'reason' => $memo['customer_note']
