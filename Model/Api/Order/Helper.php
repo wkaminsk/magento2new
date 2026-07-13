@@ -482,6 +482,25 @@ class Helper
         return $refundObjectCollection;
     }
 
+    public function getPaymentType(): string
+    {
+        $method = strtolower((string) ($this->getOrder()->getPayment()
+            ? $this->getOrder()->getPayment()->getMethod()
+            : ''));
+
+        if (str_contains($method, 'applepay') || str_contains($method, 'apple_pay')) {
+            return 'apple_pay';
+        }
+        if (str_contains($method, 'googlepay') || str_contains($method, 'google_pay')) {
+            return 'google_pay';
+        }
+        if (str_contains($method, 'paypal')) {
+            return 'paypal';
+        }
+
+        return 'card';
+    }
+
     /**
      * @return null|Model\PaymentDetails
      * @throws Exception
@@ -519,7 +538,8 @@ class Helper
                 'payer_address_status' => $paymentData['payer_address_status'],
                 'protection_eligibility' => $paymentData['protection_eligibility'],
                 'payment_status' => $paymentData['payment_status'],
-                'pending_reason' => $paymentData['pending_reason']
+                'pending_reason' => $paymentData['pending_reason'],
+                'payment_type' => 'paypal',
             ], fn ($val) => $val !== null && $val !== false && (!is_array($val) || !empty($val))));
         }
 
@@ -533,7 +553,8 @@ class Helper
                 'payer_address_status' => $paymentData['payer_address_status'],
                 'protection_eligibility' => $paymentData['protection_eligibility'],
                 'payment_status' => $paymentData['payment_status'],
-                'pending_reason' => $paymentData['pending_reason']
+                'pending_reason' => $paymentData['pending_reason'],
+                'payment_type' => 'paypal',
             ], fn ($val) => $val !== null && $val !== false && (!is_array($val) || !empty($val))));
         }
 
@@ -546,6 +567,7 @@ class Helper
             'credit_card_bin' => $paymentData['credit_card_bin'],
             'authentication_result' => $this->sanitizeAuthenticationResult($paymentData['authentication_result'] ?? null),
             'authorization_error' => $paymentData['authorization_error'] ?? null,
+            'payment_type' => $this->getPaymentType(),
         ], fn ($val) => $val !== null && $val !== false && (!is_array($val) || !empty($val))));
     }
 
@@ -625,7 +647,7 @@ class Helper
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCancelledAt()
     {
@@ -639,7 +661,7 @@ class Helper
             }
         }
 
-        return 'now';
+        return null;
     }
 
     /**
